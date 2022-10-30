@@ -105,7 +105,7 @@ public class SimpleJDBCRepository {
         return user;
     }
 
-    private void deleteUser(Long userId) throws SQLException {
+    public void deleteUser(Long userId) throws SQLException {
         ps = connection.prepareStatement(deleteUser);
         ps.setLong(1, userId);
 
