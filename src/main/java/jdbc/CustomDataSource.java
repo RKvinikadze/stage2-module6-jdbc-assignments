@@ -34,22 +34,25 @@ public class CustomDataSource implements DataSource {
         this.password = password;
     }
 
-    public static CustomDataSource getInstance() throws IOException {
+    public static CustomDataSource getInstance() {
         if (instance != null) return instance;
-        String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
-        String appConfigPath = rootPath + "app.properties";
 
-        Properties appProps = new Properties();
-        appProps.load(new FileInputStream(appConfigPath));
+        try {
+            String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
+            String appConfigPath = rootPath + "app.properties";
 
-        instance = new CustomDataSource(
-                appProps.getProperty("postgres.driver"),
-                appProps.getProperty("postgres.url"),
-                appProps.getProperty("postgres.password"),
-                appProps.getProperty("postgres.name")
-        );
+            Properties appProps = new Properties();
+            appProps.load(new FileInputStream(appConfigPath));
 
-        System.out.println(instance.driver + " " + instance.name + " " + instance.url + " " + instance.password);
+            instance = new CustomDataSource(
+                    appProps.getProperty("postgres.driver"),
+                    appProps.getProperty("postgres.url"),
+                    appProps.getProperty("postgres.password"),
+                    appProps.getProperty("postgres.name")
+            );
+        } catch (IOException e){
+            e.printStackTrace();
+        }
 
         return instance;
     }
@@ -69,7 +72,6 @@ public class CustomDataSource implements DataSource {
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             System.exit(0);
         }
-        System.out.println("Opened database successfully");
 
         return c;
     }
