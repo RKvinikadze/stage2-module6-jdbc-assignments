@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,28 +21,94 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "";
-    private static final String updateUserSQL = "";
-    private static final String deleteUser = "";
-    private static final String findUserByIdSQL = "";
-    private static final String findUserByNameSQL = "";
-    private static final String findAllUserSQL = "";
-
-    public Long createUser() {
+    public SimpleJDBCRepository(Connection connection){
+        this.connection = connection;
     }
 
-    public User findUserById(Long userId) {
+    private static final String createUserSQL = "insert into myuser(id, firstName, lastName, age) values (?, ?, ?, ?)";
+    private static final String updateUserSQL = "update myuser set firstName = ?, lastName = ?, age = ? where id = ?";
+    private static final String deleteUser = "delete from myuser where id = ?";
+    private static final String findUserByIdSQL = "select * from myuser where id = ?";
+    private static final String findUserByNameSQL = "select * from myuser where firstname = ?";
+    private static final String findAllUserSQL = "select * from myuser";
+
+    public Long createUser(User user) throws SQLException {
+        ps = connection.prepareStatement(createUserSQL);
+        ps.setLong(1, user.getId());
+        ps.setString(2, user.getFirstName());
+        ps.setString(3, user.getLastName());
+        ps.setInt(4, user.getAge());
+        ps.execute();
+
+        ps = null;
+
+        return user.getId();
     }
 
-    public User findUserByName(String userName) {
+    public User findUserById(Long userId) throws SQLException {
+        ps = connection.prepareStatement(findUserByIdSQL);
+        ps.setLong(1, userId);
+        ResultSet resultSet = ps.executeQuery();
+
+        ps = null;
+
+        return new User(
+                resultSet.getLong("id"),
+                resultSet.getString("firstName"),
+                resultSet.getString("lastName"),
+                resultSet.getInt("age")
+        );
     }
 
-    public List<User> findAllUser() {
+    public User findUserByName(String userName) throws SQLException {
+        ps = connection.prepareStatement(findUserByNameSQL);
+        ps.setString(1, userName);
+        ResultSet resultSet = ps.executeQuery();
+
+        ps = null;
+
+        return new User(
+                resultSet.getLong("id"),
+                resultSet.getString("firstName"),
+                resultSet.getString("lastName"),
+                resultSet.getInt("age")
+        );
     }
 
-    public User updateUser() {
+    public List<User> findAllUser() throws SQLException {
+        st = connection.createStatement();
+        ResultSet resultSet = st.executeQuery(findAllUserSQL);
+        st = null;
+
+        List<User> users = new ArrayList<>();
+        while (resultSet.next()){
+            users.add(new User(
+                    resultSet.getLong("id"),
+                    resultSet.getString("firstName"),
+                    resultSet.getString("lastName"),
+                    resultSet.getInt("age")
+            ));
+        }
+
+        return users;
     }
 
-    private void deleteUser(Long userId) {
+    public User updateUser(User user) throws SQLException {
+        ps = connection.prepareStatement(updateUserSQL);
+        ps.setString(1, user.getFirstName());
+        ps.setString(2, user.getFirstName());
+        ps.setInt(3, user.getAge());
+        ps.setLong(4, user.getId());
+
+        ps = null;
+
+        return user;
+    }
+
+    private void deleteUser(Long userId) throws SQLException {
+        ps = connection.prepareStatement(deleteUser);
+        ps.setLong(1, userId);
+
+        ps = null;
     }
 }
