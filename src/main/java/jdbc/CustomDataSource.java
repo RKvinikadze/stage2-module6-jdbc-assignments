@@ -76,20 +76,20 @@ public class CustomDataSource implements DataSource {
 
 
     @Override
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() {
         return getConnectionCommon(null, null, null);
     }
 
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
+    public Connection getConnection(String username, String password){
         return getConnectionCommon(null, username, password);
     }
 
-    public Connection getConnection(String url) throws SQLException {
+    public Connection getConnection(String url) {
         return getConnectionCommon(url, null, null);
     }
 
-    public Connection getConnection(String url, String username, String password) throws SQLException {
+    public Connection getConnection(String url, String username, String password) {
         return getConnectionCommon(url, username, password);
     }
 

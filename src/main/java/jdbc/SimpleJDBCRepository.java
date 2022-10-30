@@ -32,83 +32,104 @@ public class SimpleJDBCRepository {
     private static final String findUserByNameSQL = "select * from myuser where firstname = ?";
     private static final String findAllUserSQL = "select * from myuser";
 
-    public Long createUser(User user) throws SQLException {
-        ps = connection.prepareStatement(createUserSQL);
-        ps.setLong(1, user.getId());
-        ps.setString(2, user.getFirstName());
-        ps.setString(3, user.getLastName());
-        ps.setInt(4, user.getAge());
-        ps.execute();
+    public Long createUser(User user){
+        Long id = null;
 
-        ps = null;
+        try{
+            ps = connection.prepareStatement(createUserSQL);
+            ps.setLong(1, user.getId());
+            ps.setString(2, user.getFirstName());
+            ps.setString(3, user.getLastName());
+            ps.setInt(4, user.getAge());
+            ps.execute();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
 
-        return user.getId();
+        return id;
     }
 
-    public User findUserById(Long userId) throws SQLException {
-        ps = connection.prepareStatement(findUserByIdSQL);
-        ps.setLong(1, userId);
-        ResultSet resultSet = ps.executeQuery();
+    public User findUserById(Long userId) {
+        User user = null;
+        try{
+            ps = connection.prepareStatement(findUserByIdSQL);
+            ps.setLong(1, userId);
+            ResultSet resultSet = ps.executeQuery();
 
-        ps = null;
+            user = new User(
+                    resultSet.getLong("id"),
+                    resultSet.getString("firstName"),
+                    resultSet.getString("lastName"),
+                    resultSet.getInt("age"));
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
 
-        return new User(
-                resultSet.getLong("id"),
-                resultSet.getString("firstName"),
-                resultSet.getString("lastName"),
-                resultSet.getInt("age")
-        );
+        return user;
     }
 
-    public User findUserByName(String userName) throws SQLException {
-        ps = connection.prepareStatement(findUserByNameSQL);
-        ps.setString(1, userName);
-        ResultSet resultSet = ps.executeQuery();
+    public User findUserByName(String userName){
+        User user = null;
+        try {
+            ps = connection.prepareStatement(findUserByNameSQL);
+            ps.setString(1, userName);
+            ResultSet resultSet = ps.executeQuery();
 
-        ps = null;
-
-        return new User(
-                resultSet.getLong("id"),
-                resultSet.getString("firstName"),
-                resultSet.getString("lastName"),
-                resultSet.getInt("age")
-        );
-    }
-
-    public List<User> findAllUser() throws SQLException {
-        st = connection.createStatement();
-        ResultSet resultSet = st.executeQuery(findAllUserSQL);
-        st = null;
-
-        List<User> users = new ArrayList<>();
-        while (resultSet.next()){
-            users.add(new User(
+            user = new User(
                     resultSet.getLong("id"),
                     resultSet.getString("firstName"),
                     resultSet.getString("lastName"),
                     resultSet.getInt("age")
-            ));
+            );
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+    public List<User> findAllUser(){
+        List<User> users = null;
+        try {
+            st = connection.createStatement();
+            ResultSet resultSet = st.executeQuery(findAllUserSQL);
+
+            users = new ArrayList<>();
+            while (resultSet.next()){
+                users.add(new User(
+                        resultSet.getLong("id"),
+                        resultSet.getString("firstName"),
+                        resultSet.getString("lastName"),
+                        resultSet.getInt("age")
+                ));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
         }
 
         return users;
     }
 
-    public User updateUser(User user) throws SQLException {
-        ps = connection.prepareStatement(updateUserSQL);
-        ps.setString(1, user.getFirstName());
-        ps.setString(2, user.getFirstName());
-        ps.setInt(3, user.getAge());
-        ps.setLong(4, user.getId());
-
-        ps = null;
+    public User updateUser(User user){
+        try {
+            ps = connection.prepareStatement(updateUserSQL);
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getFirstName());
+            ps.setInt(3, user.getAge());
+            ps.setLong(4, user.getId());
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return user;
     }
 
-    public void deleteUser(Long userId) throws SQLException {
-        ps = connection.prepareStatement(deleteUser);
-        ps.setLong(1, userId);
-
-        ps = null;
+    public void deleteUser(Long userId) {
+        try{
+            ps = connection.prepareStatement(deleteUser);
+            ps.setLong(1, userId);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 }

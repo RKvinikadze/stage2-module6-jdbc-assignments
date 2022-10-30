@@ -9,13 +9,29 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class CustomConnector {
-    public Connection getConnection(String url) throws IOException, SQLException {
-        CustomDataSource customDataSource = CustomDataSource.getInstance();
-        return customDataSource.getConnection(url);
+    public Connection getConnection(String url) {
+        Connection connection = null;
+
+        try {
+            CustomDataSource customDataSource = CustomDataSource.getInstance();
+            connection = customDataSource.getConnection(url);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return connection;
     }
 
-    public Connection getConnection(String url, String user, String password) throws IOException, SQLException {
-        CustomDataSource customDataSource = CustomDataSource.getInstance();
-        return customDataSource.getConnection(url, user, password);
+    public Connection getConnection(String url, String user, String password){
+        Connection connection = null;
+
+        try {
+            CustomDataSource customDataSource = CustomDataSource.getInstance();
+            connection = customDataSource.getConnection(url, user, password);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return connection;
     }
 }
