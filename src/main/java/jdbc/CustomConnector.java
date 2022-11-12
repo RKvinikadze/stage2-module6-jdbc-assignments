@@ -13,8 +13,7 @@ public class CustomConnector {
         Connection connection = null;
 
         try {
-            CustomDataSource customDataSource = CustomDataSource.getInstance();
-            connection = customDataSource.getConnection(url);
+            connection = DriverManager.getConnection(url);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -26,8 +25,7 @@ public class CustomConnector {
         Connection connection = null;
 
         try {
-            CustomDataSource customDataSource = CustomDataSource.getInstance();
-            connection = customDataSource.getConnection(url, user, password);
+            connection = DriverManager.getConnection(url, user, password);
         }catch (Exception e){
             e.printStackTrace();
         }

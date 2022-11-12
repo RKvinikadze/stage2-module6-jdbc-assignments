@@ -44,7 +44,7 @@ public class SimpleJDBCRepository {
             e.printStackTrace();
         }
 
-        return id;
+        return user.getId();
     }
 
     public User findUserById(Long userId) {

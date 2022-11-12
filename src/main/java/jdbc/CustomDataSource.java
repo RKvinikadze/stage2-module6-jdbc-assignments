@@ -38,11 +38,10 @@ public class CustomDataSource implements DataSource {
         if (instance != null) return instance;
 
         try {
-            String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
-            String appConfigPath = rootPath + "app.properties";
-
             Properties appProps = new Properties();
-            appProps.load(new FileInputStream(appConfigPath));
+            appProps.load(
+                    CustomDataSource.class.getClassLoader().getResourceAsStream("app.properties")
+            );
 
             instance = new CustomDataSource(
                     appProps.getProperty("postgres.driver"),
@@ -57,42 +56,15 @@ public class CustomDataSource implements DataSource {
         return instance;
     }
 
-    private Connection getConnectionCommon(String url, String name, String password){
-        String _url = url == null ? this.url : url;
-        String _user = name == null ? this.name : name;
-        String _password = password == null ? this.password : password;
-
-        Connection c = null;
-        try {
-            Class.forName(driver);
-            c = DriverManager
-                    .getConnection(_url, _user, _password);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            System.exit(0);
-        }
-
-        return c;
-    }
-
 
     @Override
-    public Connection getConnection() {
-        return getConnectionCommon(null, null, null);
+    public Connection getConnection(){
+        return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
-    public Connection getConnection(String username, String password){
-        return getConnectionCommon(null, username, password);
-    }
-
-    public Connection getConnection(String url) {
-        return getConnectionCommon(url, null, null);
-    }
-
-    public Connection getConnection(String url, String username, String password) {
-        return getConnectionCommon(url, username, password);
+    public Connection getConnection(String username, String password) {
+        return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
